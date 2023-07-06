@@ -43,25 +43,60 @@ public class App {
 			log.info("\t" + order.toString());
 			System.out.println("Products:");
 			for (Product product : order.getProducts()) {
+				double roundedPrice = Math.round(product.getPrice() * 100.0) / 100.0;
+				product.setPrice(roundedPrice);
 				log.info("\t" + product.toString());
 				System.out.println("-------------------------------------------------------");
 			}
+		}
 
-			// ESRCIZIO3-----------------------------------------------------------------
-			List<Product> pdt = createProductList();
+		// ESERCIZIO3-----------------------------------------------------------------
+		List<Product> pdt = createProductList();
 
-			List<Product> pdtList = pdt.stream().filter(p -> p.getCategory().equals("Boys")).map(p -> {
-				double discount = p.getPrice() * 0.1;
-				double discountPrice = Double
-						.parseDouble(String.format("%.2f", p.getPrice() - discount).replace(",", "."));
-				return new Product(p.getId(), p.getName(), p.getCategory(), discountPrice);
-			}).collect(Collectors.toList());
+		List<Product> pdtList = pdt.stream().filter(p -> p.getCategory().equals("Boys")).map(p -> {
+			double discount = p.getPrice() * 0.1;
+			double discountPrice = Double.parseDouble(String.format("%.2f", p.getPrice() - discount).replace(",", "."));
+			return new Product(p.getId(), p.getName(), p.getCategory(), discountPrice);
+		}).collect(Collectors.toList());
 
-			System.out.println("Esercizio3");
-			System.out.println("Prodotti scontati: ");
-			for (Product pdts : pdtList) {
-				log.info(pdts.toString());
-			}
+		System.out.println("Esercizio3");
+		System.out.println("Prodotti scontati: ");
+		for (Product pdts : pdtList) {
+			log.info(pdts.toString());
+		}
+
+		// ESERCIZIO4--------------------------------------------------------------------
+		Random random = new Random();
+		List<Order> ordini = new ArrayList<>();
+
+		ordini.add(new Order(random.nextLong(), "In corso", LocalDate.of(2021, 3, 10), LocalDate.of(2021, 3, 15),
+				List.of(new Product(random.nextLong(), "prodotto1", "Boys", random.nextDouble() * 100),
+						new Product(random.nextLong(), "prodotto2", "Girls", random.nextDouble() * 100),
+						new Product(random.nextLong(), "prodotto3", "Boys", random.nextDouble() * 100)),
+				new Customer(random.nextLong(), "Cliente1", 2)));
+
+		ordini.add(new Order(random.nextLong(), "In corso", LocalDate.of(2021, 2, 5), LocalDate.of(2021, 2, 10),
+				List.of(new Product(random.nextLong(), "prodotto4", "Boys", random.nextDouble() * 100),
+						new Product(random.nextLong(), "prodotto5", "Boys", random.nextDouble() * 100),
+						new Product(random.nextLong(), "prodotto6", "Boys", random.nextDouble() * 100)),
+				new Customer(random.nextLong(), "Cliente2", 1)));
+
+		ordini.add(new Order(random.nextLong(), "In corso", LocalDate.of(2021, 4, 1), LocalDate.of(2021, 4, 5),
+				List.of(new Product(random.nextLong(), "prodotto7", "Girls", random.nextDouble() * 100),
+						new Product(random.nextLong(), "prodotto8", "Girls", random.nextDouble() * 100),
+						new Product(random.nextLong(), "prodotto9", "Girls", random.nextDouble() * 100)),
+				new Customer(random.nextLong(), "Cliente3", 2)));
+
+		List<Product> pdt4 = ordini.stream().filter(order -> order.getCustomer().getTier() == 2)
+				.filter(order -> order.getOrderDate().isAfter(LocalDate.of(2021, 1, 31))
+						&& order.getOrderDate().isBefore(LocalDate.of(2021, 4, 2)))
+				.flatMap(order -> order.getProducts().stream()).collect(Collectors.toList());
+
+		System.out.println("ESERCIZIO 4");
+		for (Product product : pdt4) {
+			double roundedPrice = Math.round(product.getPrice() * 100.0) / 100.0;
+			product.setPrice(roundedPrice);
+			log.info(product.toString());
 		}
 
 	}
@@ -96,7 +131,8 @@ public class App {
 
 		for (int i = 1; i <= quantita; i++) {
 			Long id = Long.valueOf(i);
-			Product pdt = new Product(id, "Product" + i, category, num.nextDouble(100));
+			double price = Math.round(num.nextDouble() * 100.0) / 100.0;
+			Product pdt = new Product(id, "Product" + i, category, price);
 			products.add(pdt);
 		}
 		return products;
